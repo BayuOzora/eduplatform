@@ -53,5 +53,5 @@ API available at: http://127.0.0.1:8000/api/
 
 ## Contributors
 
-- Backend: Django REST Framework
+- Backend: Ricky Darmawan
 - Frontend: (Coming soon)
