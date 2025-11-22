@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # Third party apps
     'rest_framework',
     'corsheaders',
+    'drf_spectacular',
     
     # Local apps
     'users',
@@ -161,6 +162,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # Simple JWT settings (basic defaults; adjust lifetimes for production)
@@ -178,3 +180,28 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8080",
 ]
+
+# Spectacular Settings for API Documentation
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'EduPlatform API',
+    'DESCRIPTION': 'Educational Platform REST API with JWT Authentication and Role-Based Permissions',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': '/api/',
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+    },
+    'SECURITY': [{'bearerAuth': []}],
+    'COMPONENTS': {
+        'securitySchemes': {
+            'bearerAuth': {
+                'type': 'http',
+                'scheme': 'bearer',
+                'bearerFormat': 'JWT',
+            }
+        }
+    },
+}
