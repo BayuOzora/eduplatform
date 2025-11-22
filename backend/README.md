@@ -110,6 +110,11 @@ POST /api/token/refresh/
 
 Semua endpoint tersedia di `/api/`:
 
+### API Documentation (Swagger)
+- **Swagger UI**: http://127.0.0.1:8000/api/docs/
+- **ReDoc**: http://127.0.0.1:8000/api/redoc/
+- **OpenAPI Schema**: http://127.0.0.1:8000/api/schema/
+
 ### Authentication
 - `POST /api/token/` - Obtain JWT token
 - `POST /api/token/refresh/` - Refresh access token
