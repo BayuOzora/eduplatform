@@ -1,17 +1,16 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from .models import Course
 from .serializers import CourseSerializer
-from rest_framework.permissions import AllowAny # Mengizinkan akses untuk testing
 
 class CourseViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet ini otomatis menyediakan fungsi:
-    - LIST (Melihat semua data)
-    - CREATE (Menambah data)
-    - RETRIEVE (Melihat 1 data detail)
-    - UPDATE (Mengedit data)
-    - DESTROY (Menghapus data)
-    """
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    # permission_classes = [AllowAny] # Aktifkan ini jika Anda belum login di frontend
+    # Mengizinkan akses tanpa login untuk kemudahan testing awal
+    permission_classes = [permissions.AllowAny]
+
+    def perform_create(self, serializer):
+        # Jika user login, simpan sebagai instructor. Jika tidak, biarkan kosong.
+        if self.request.user.is_authenticated:
+            serializer.save(instructor=self.request.user)
+        else:
+            serializer.save()
