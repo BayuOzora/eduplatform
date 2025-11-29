@@ -1,95 +1,216 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { AlertCircle, Clock, CheckCircle2, Calendar, Circle } from "lucide-react";
-import { Card, Badge, Button, Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/primitives";
-import { cn } from "../lib/utils";
+import { MainLayout } from "@/components/layout/MainLayout";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar, Clock, Circle, CheckCircle2, AlertCircle } from "lucide-react";
 
-export default function Tasks({ isMobile = false }: { isMobile: boolean }) {
-  const [activeTab, setActiveTab] = useState("all");
-  const tasks = [
-    { id: 1, title: "Final Project Report", course: "Software Engineering", courseColor: "bg-blue-500", dueDate: "Oct 25", dueTime: "11:59 PM", priority: "high", status: "pending", points: 100, type: "assignment" },
-    { id: 2, title: "Weekly Quiz Chapter 5", course: "Data Structures", courseColor: "bg-purple-500", dueDate: "Oct 24", dueTime: "3:00 PM", priority: "high", status: "pending", points: 50, type: "quiz" },
-    { id: 3, title: "Lab Assignment 4", course: "Database Systems", courseColor: "bg-green-500", dueDate: "Oct 26", dueTime: "5:00 PM", priority: "medium", status: "in-progress", points: 75, type: "lab" },
-    { id: 5, title: "Code Review Exercise", course: "Software Engineering", courseColor: "bg-blue-500", dueDate: "Oct 23", dueTime: "11:59 PM", priority: "low", status: "completed", points: 30, type: "exercise" },
-  ];
+const taskStats = [
+  { label: "Pending", count: 4, color: "bg-lms-coral-light", iconColor: "text-lms-coral", icon: AlertCircle },
+  { label: "In Progress", count: 2, color: "bg-lms-orange-light", iconColor: "text-lms-orange", icon: Clock },
+  { label: "Completed", count: 1, color: "bg-lms-green-light", iconColor: "text-lms-green", icon: CheckCircle2 },
+];
 
-  const filteredTasks = activeTab === "all" ? tasks : tasks.filter(t => t.status === activeTab);
-  const pendingCount = tasks.filter(t => t.status === "pending").length;
-  const progressCount = tasks.filter(t => t.status === "in-progress").length;
-  const completedCount = tasks.filter(t => t.status === "completed").length;
+const tasks = [
+  {
+    id: 1,
+    title: "Final Project Report",
+    course: "Software Engineering",
+    courseColor: "bg-lms-blue",
+    description: "Complete and submit the final project documentation with UML diagrams.",
+    date: "Oct 25, 2025",
+    time: "11:59 PM",
+    points: 100,
+    priority: "high",
+    type: "assignment",
+    status: "pending",
+  },
+  {
+    id: 2,
+    title: "Weekly Quiz Chapter 5",
+    course: "Data Structures",
+    courseColor: "bg-lms-purple",
+    description: "Quiz covering binary trees, heaps, and graph algorithms.",
+    date: "Oct 24, 2025",
+    time: "3:00 PM",
+    points: 50,
+    priority: "high",
+    type: "quiz",
+    status: "pending",
+  },
+  {
+    id: 3,
+    title: "Lab Assignment 4",
+    course: "Database Systems",
+    courseColor: "bg-lms-green",
+    description: "Design and implement a normalized database schema for an e-commerce system.",
+    date: "Oct 26, 2025",
+    time: "5:00 PM",
+    points: 75,
+    priority: "medium",
+    type: "lab",
+    status: "in-progress",
+  },
+  {
+    id: 4,
+    title: "Research Paper Review",
+    course: "Machine Learning",
+    courseColor: "bg-lms-coral",
+    description: "Review and critique a research paper on neural networks.",
+    date: "Oct 28, 2025",
+    time: "11:59 PM",
+    points: 60,
+    priority: "medium",
+    type: "assignment",
+    status: "pending",
+  },
+  {
+    id: 5,
+    title: "Code Review Exercise",
+    course: "Software Engineering",
+    courseColor: "bg-lms-blue",
+    description: "Review peer code submissions and provide constructive feedback.",
+    date: "Oct 23, 2025",
+    time: "11:59 PM",
+    points: 30,
+    priority: "low",
+    type: "exercise",
+    status: "completed",
+  },
+  {
+    id: 6,
+    title: "Midterm Exam Preparation",
+    course: "Data Structures",
+    courseColor: "bg-lms-purple",
+    description: "Study all materials from chapters 1-6 for the midterm exam.",
+    date: "Oct 30, 2025",
+    time: "2:00 PM",
+    points: 150,
+    priority: "high",
+    type: "exam",
+    status: "pending",
+  },
+  {
+    id: 7,
+    title: "Frontend Implementation",
+    course: "Web Development",
+    courseColor: "bg-lms-orange",
+    description: "Build responsive UI components using React and Tailwind CSS.",
+    date: "Oct 27, 2025",
+    time: "11:59 PM",
+    points: 80,
+    priority: "medium",
+    type: "project",
+    status: "in-progress",
+  },
+];
+
+const priorityColors = {
+  high: "bg-lms-coral text-card",
+  medium: "bg-lms-orange text-card",
+  low: "bg-lms-green text-card",
+};
+
+const statusIcons = {
+  pending: Circle,
+  "in-progress": AlertCircle,
+  completed: CheckCircle2,
+};
+
+export default function Tasks() {
+  const [filter, setFilter] = useState("all");
+
+  const filteredTasks = tasks.filter((task) => {
+    if (filter === "all") return true;
+    if (filter === "in-progress") return task.status === "in-progress";
+    return task.status === filter;
+  });
 
   return (
-    <motion.div className="flex-1 p-6 overflow-y-auto lg:p-8 bg-slate-50 no-scrollbar" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="mb-8">
-        <h1 className="text-[28px] lg:text-[32px] font-[600] mb-2">My Tasks</h1>
-        <p className="text-[15px] text-muted-foreground">Track all your assignments and deadlines</p>
-      </div>
+    <MainLayout>
+      <div className="max-w-4xl mx-auto animate-fade-in">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">My Tasks</h1>
+          <p className="text-muted-foreground">Track and manage all your assignments and deadlines</p>
+        </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        {[
-          { label: "Pending", count: pendingCount, color: "bg-red-500", bg: "from-red-50 to-red-100/50", icon: AlertCircle },
-          { label: "In Progress", count: progressCount, color: "bg-orange-500", bg: "from-orange-50 to-orange-100/50", icon: Clock },
-          { label: "Completed", count: completedCount, color: "bg-green-500", bg: "from-green-50 to-green-100/50", icon: CheckCircle2 }
-        ].map((stat, i) => (
-          <Card key={i} className={cn("p-4 lg:p-6 rounded-[20px] border border-border/50 bg-gradient-to-br", stat.bg)}>
-            <div className={cn("flex items-center gap-3", isMobile && "flex-col text-center")}>
-              <div className={cn("w-10 h-10 lg:w-12 lg:h-12 rounded-[12px] flex items-center justify-center text-white", stat.color)}>
-                <stat.icon className="w-5 h-5 lg:w-6 lg:h-6" />
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          {taskStats.map((stat) => (
+            <Card key={stat.label} className={`p-4 ${stat.color}`}>
+              <div className="flex items-center gap-3">
+                <stat.icon className={`h-6 w-6 ${stat.iconColor}`} />
+                <div>
+                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                  <p className="text-2xl font-bold">{stat.count}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-[11px] lg:text-[13px] text-muted-foreground">{stat.label}</p>
-                <p className="text-[20px] lg:text-[24px] font-[600]">{stat.count}</p>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      <Tabs className="space-y-6">
-        <TabsList className="bg-white p-1 rounded-[12px] border border-border/50 w-full grid grid-cols-4">
-          <TabsTrigger value="all" activeTab={activeTab} setActiveTab={setActiveTab} className="rounded-[8px]">All</TabsTrigger>
-          <TabsTrigger value="pending" activeTab={activeTab} setActiveTab={setActiveTab} className="rounded-[8px]">Pending</TabsTrigger>
-          <TabsTrigger value="in-progress" activeTab={activeTab} setActiveTab={setActiveTab} className="rounded-[8px] text-[11px] lg:text-sm">Progress</TabsTrigger>
-          <TabsTrigger value="completed" activeTab={activeTab} setActiveTab={setActiveTab} className="rounded-[8px]">Done</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={activeTab} activeTab={activeTab} className="space-y-4">
-          {filteredTasks.map(task => (
-             <Card key={task.id} className="p-4 lg:p-6 rounded-[20px] border border-border/50 hover:shadow-lg transition-all cursor-pointer">
-             <div className="flex items-start gap-4">
-               <div className="pt-1">
-                 {task.status === "completed" ? <CheckCircle2 className="w-6 h-6 text-green-500" /> : task.status === "in-progress" ? <AlertCircle className="w-6 h-6 text-orange-500" /> : <Circle className="w-6 h-6 text-muted-foreground" />}
-               </div>
-               <div className="flex-1 min-w-0">
-                 <div className="flex items-start justify-between gap-2 mb-2">
-                   <div className="flex-1">
-                     <h3 className="text-[16px] lg:text-[17px] font-[600] mb-1">{task.title}</h3>
-                     <div className="flex items-center gap-2">
-                        <div className={`w-2.5 h-2.5 ${task.courseColor} rounded-full`} />
-                        <span className="text-[12px] lg:text-[13px] text-muted-foreground">{task.course}</span>
-                     </div>
-                   </div>
-                   <div className="flex flex-col items-end gap-2 lg:flex-row lg:items-center">
-                    <Badge variant="secondary" className={cn("text-[10px] px-2 py-0.5", task.priority === "high" ? "bg-red-100 text-red-700" : task.priority === "medium" ? "bg-orange-100 text-orange-700" : "bg-blue-100 text-blue-700")}>{task.priority}</Badge>
-                    <Badge variant="outline" className="text-[10px]">{task.type}</Badge>
-                   </div>
-                 </div>
-                 <div className="flex items-center justify-between pt-2 mt-3 border-t border-border/50">
-                   <div className="flex items-center gap-4 text-[12px] lg:text-[13px] text-muted-foreground">
-                     <div className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /><span>{task.dueDate}</span></div>
-                     <div className="flex items-center gap-1.5"><Clock className="w-4 h-4" /><span>{task.dueTime}</span></div>
-                   </div>
-                   <div className="flex items-center gap-3">
-                      <span className="text-[13px] font-[600] text-primary">{task.points} pts</span>
-                      <Button size="sm" variant={task.status === "completed" ? "outline" : "default"} className="h-8 rounded-[8px]">{task.status === "completed" ? "View" : "Start"}</Button>
-                   </div>
-                 </div>
-               </div>
-             </div>
-           </Card>
+            </Card>
           ))}
-        </TabsContent>
-      </Tabs>
-    </motion.div>
+        </div>
+
+        <Tabs defaultValue="all" className="mb-6" onValueChange={setFilter}>
+          <TabsList>
+            <TabsTrigger value="all">All Tasks</TabsTrigger>
+            <TabsTrigger value="pending">Pending</TabsTrigger>
+            <TabsTrigger value="in-progress">In Progress</TabsTrigger>
+            <TabsTrigger value="completed">Completed</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        <div className="space-y-4">
+          {filteredTasks.map((task) => {
+            const StatusIcon = statusIcons[task.status as keyof typeof statusIcons];
+            return (
+              <Card key={task.id} className="p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-4">
+                  <StatusIcon className={`h-5 w-5 mt-1 ${
+                    task.status === "completed" ? "text-lms-green" : 
+                    task.status === "in-progress" ? "text-lms-orange" : "text-muted-foreground"
+                  }`} />
+                  
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-semibold text-lg">{task.title}</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`w-2 h-2 rounded-full ${task.courseColor}`} />
+                          <span className="text-sm text-muted-foreground">{task.course}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge className={priorityColors[task.priority as keyof typeof priorityColors]}>
+                          {task.priority}
+                        </Badge>
+                        <Badge variant="outline">{task.type}</Badge>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-muted-foreground mt-2">{task.description}</p>
+
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          {task.date}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          {task.time}
+                        </span>
+                        <span className="font-medium text-foreground">{task.points} pts</span>
+                      </div>
+                      <Button size="sm" variant={task.status === "completed" ? "outline" : "default"}>
+                        {task.status === "completed" ? "View Submission" : "Start Task"}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    </MainLayout>
   );
 }
