@@ -1,17 +1,19 @@
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ganti-ini-nanti-ya-karena-ini-rahasia'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# Izinkan semua host (Penting untuk Docker)
+ALLOWED_HOSTS = ['*']
 
-# --- BAGIAN 1: INSTALLED_APPS ---
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -20,21 +22,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    # Library Pihak Ketiga
+    # Third party
     'rest_framework',
     'corsheaders',
     
-    # Aplikasi Buatan Sendiri
-    'users',        # Pastikan 'users' ada di sini
+    # Local apps
+    'users',
     'courses',
     'assignments',
     'materials',
     'discussions',
 ]
 
-# --- BAGIAN 2: MIDDLEWARE ---
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # Wajib di paling atas
+    'corsheaders.middleware.CorsMiddleware', # Wajib paling atas
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -44,7 +45,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# --- BAGIAN 3: Konfigurasi CORS (Agar Frontend Bisa Akses) ---
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -70,41 +70,42 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'eduplatform.wsgi.application'
 
-# Database
+# Database Configuration (Docker Friendly)
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_DB', 'eduplatform_db'),
+        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'postgres'),
+        'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }
 
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files
+# --- BAGIAN INI YANG MENYEBABKAN ERROR SEBELUMNYA ---
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Kita harus memberitahu Django di mana mengumpulkan file statis di dalam Docker
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') 
+# -----------------------------------------------------
 
-# --- BAGIAN 4: PENGATURAN USER CUSTOM (SOLUSI ERROR ANDA) ---
-# Baris ini memberitahu Django untuk menggunakan model User di aplikasi 'users'
-# bukan model User bawaan (auth.User).
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ]
+}
