@@ -7,7 +7,7 @@ Educational Platform with Django REST Framework Backend
 ```
 eduplatform/
 ├── backend/          # Django REST Framework API
-└── frontend/         # (To be added by frontend developer)
+└── frontend/         # React + Vite Frontend
 ```
 
 ## Backend
@@ -22,6 +22,17 @@ Django REST Framework educational platform with:
 - PostgreSQL database
 
 See `backend/README.md` for detailed backend documentation.
+
+## Frontend
+
+React-based Single Page Application built with Vite, featuring:
+- Responsive layout (Desktop Sidebar / Mobile Bottom Nav)
+- Dashboard with academic progress visualization
+- Course management interface
+- Task tracking (Kanban-style)
+- Real-time chat simulation
+- User profile management
+- Tailwind CSS for styling
 
 ## Setup
 
@@ -51,7 +62,16 @@ python manage.py runserver
 
 API available at: http://127.0.0.1:8000/api/
 
+### Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend available at: http://localhost:5173/
+
 ## Contributors
 
 - Backend: Ricky Darmawan
-- Frontend: (Coming soon)
+- Frontend: Muhammad Daffa Ramdhani
